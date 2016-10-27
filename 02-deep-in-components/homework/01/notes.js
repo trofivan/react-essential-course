@@ -50,7 +50,7 @@ var NoteEditor = React.createClass({
                     onChange={this.handleTextChange}
                 />
 
-                <NoteColor onColorChange={this.handleColorChange} />
+                <NoteColorChange onColorChange={this.handleColorChange} color='Yellow' />
 
                 <button className="add-button" onClick={this.handleNoteAdd}>Add</button>
             </div>
@@ -58,38 +58,53 @@ var NoteEditor = React.createClass({
     }
 });
 
-var NoteColor = React.createClass({
-    getDefaultProps: function() {
+var NoteColorRound = React.createClass({
+    render: function(){
+        var roundStyle = {
+            backgroundColor: this.props.color
+        };
+        return (
+            <div>
+                <input
+                    type='radio'
+                    name='color'
+                    value={this.props.color}
+                    id={'r-'+this.props.color}
+                />
+                <label class='color' style={roundStyle} htmlFor={'r-'+this.props.color} />
+            </div>
+        );
+    }
+});
+
+var NoteColorChange = React.createClass({
+    getDefaultProps: function(){
         return {
-            colors: ['Tomato', 'Orange', 'Yellow', 'PaleGreen', 'SkyBlue', 'RoyalBlue', 'MediumOrchid']
-        }
+            'color': 'Yellow'
+        };
+    },
+    getInitialState: function(){
+        return {
+            'color': this.props.color
+        };
     },
     handleColorChange: function(event){
         this.props.onColorChange(event.target.value);
     },
     /* Выбрали цвет заметки */
     componentDidMount: function(){
-        this.props.onColorChange(this.props.colors[2]);
+        this.props.onColorChange('Yellow');
     },
     render: function() {
+        var COLORS = ['Tomato', 'Orange', 'Yellow', 'PaleGreen', 'SkyBlue', 'RoyalBlue', 'MediumOrchid'];
+
         return(
             <div className='colors' onChange={this.handleColorChange}>
-                {this.props.colors.map(function(color, index){
-                    var style = {
-                        backgroundColor: color
-                    };
-                    return (
-                        <div>
-                            <input
-                                type='radio'
-                                name='color'
-                                value={color}
-                                id={'r-'+color}
-                            />
-                            <label class='color' style={style} htmlFor={'r-'+color} />
-                        </div>
-                    );
-                })}
+                {
+                    COLORS.map(function(color){
+                        return <NoteColorRound color={color}/>;
+                    })
+                }
             </div>
         );
     }
