@@ -141,7 +141,9 @@ const ToDoApp = React.createClass({
     },
     onToDoAdd(task) {
         let currentTasks = this.state.tasks.slice();
-        currentTasks.unshift(task);
+
+        if(task.text)
+            currentTasks.unshift(task);
 
         this.setState({
             'tasks' : currentTasks
