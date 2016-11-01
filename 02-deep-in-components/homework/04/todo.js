@@ -7,16 +7,19 @@ const ToDo = React.createClass({
                     className='checkbox'
                     type='checkbox'
                     checked={(this.props.taskIsComplete)?(true):(false)}
-                    />
+                />
+
                 <label
                     htmlFor={this.props.taskID}
                     className={(this.props.taskIsComplete)?('success'):('')}
-                    onClick={this.props.onToDoComplete}>
-                        {this.props.taskText}
+                    onClick={this.props.onToDoComplete}
+                >
+                    {this.props.taskText}
                 </label>
-                <button
-                    className='destroy'
-                    onClick={this.props.onToDoRemove}>✕</button>
+
+                <button className='destroy' onClick={this.props.onToDoRemove}>
+                    ✕
+                </button>
             </li>
         );
     }
@@ -24,8 +27,8 @@ const ToDo = React.createClass({
 
 const ListToDo = React.createClass({
     render() {
-        const onToDoComplete = this.props.onToDoComplete;
-        const onToDoRemove = this.props.onToDoRemove;
+        const handleToDoComplete = this.props.onToDoComplete;
+        const handleToDoRemove = this.props.onToDoRemove;
 
         return (
             <ul className='list-todo'>
@@ -35,8 +38,8 @@ const ListToDo = React.createClass({
                             taskID={task.id}
                             taskIsComplete={task.complete}
                             taskText={task.text}
-                            onToDoComplete={onToDoComplete.bind(null, task)}
-                            onToDoRemove={onToDoRemove.bind(null, task)}
+                            onToDoComplete={handleToDoComplete.bind(null, task)}
+                            onToDoRemove={handleToDoRemove.bind(null, task)}
                         />
                     )
                 }
@@ -47,16 +50,17 @@ const ListToDo = React.createClass({
 
 const FilterToDo = React.createClass({
     render() {
-        let currentFilter = this.props.currentFilter;
-        let btnText = this.props.currentButton.text;
-        let btnStatus = this.props.currentButton.status;
+        const currentFilter = this.props.currentFilter;
+        const btnText = this.props.currentButton.text;
+        const btnStatus = this.props.currentButton.status;
 
         return (
             <li>
                 <a
                     href={'#/'+btnStatus}
                     className={(currentFilter === btnStatus)?('active'):('')}
-                    onClick={this.props.handleOnClick.bind(null, btnStatus)}>
+                    onClick={this.props.onClick.bind(null, btnStatus)}
+                >
                     {btnText}
                 </a>
             </li>
@@ -68,16 +72,16 @@ const FiltersToDo = React.createClass({
     render() {
         const FILTER_BUTTONS = [
             {
-                'status' : 'all',
-                'text' : 'Все'
+                status : 'all',
+                text : 'Все'
             },
             {
-                'status' : 'active',
-                'text' : 'Активные'
+                status : 'active',
+                text : 'Активные'
             },
             {
-                'status' : 'completed',
-                'text' : 'Закрытые'
+                status : 'completed',
+                text : 'Закрытые'
             }
         ];
 
@@ -88,7 +92,7 @@ const FiltersToDo = React.createClass({
                         <FilterToDo
                             currentButton={currentButton}
                             currentFilter={this.props.currentFilter}
-                            handleOnClick={this.props.onToDoFilter}
+                            onClick={this.props.onToDoFilter}
                         />
                     )
                 }
@@ -115,7 +119,8 @@ const NewToDo = React.createClass({
                 type='text'
                 className='new-todo'
                 placeholder='Что хотим сделать?'
-                onKeyPress={this.handleKeyPress} />
+                onKeyPress={this.handleKeyPress}
+            />
         );
     }
 });
@@ -123,8 +128,8 @@ const NewToDo = React.createClass({
 const ToDoApp = React.createClass({
     getInitialState(){
         return {
-            'tasks': [],
-            'filter': 'all'
+            tasks: [],
+            filter: 'all'
         };
     },
     componentDidUpdate() {
@@ -135,59 +140,58 @@ const ToDoApp = React.createClass({
 
         if(tasks) {
             this.setState({
-                'tasks' : JSON.parse(tasks)
+                tasks : JSON.parse(tasks)
             });
         }
     },
-    onToDoAdd(task) {
+    handleToDoAdd(task) {
         let currentTasks = this.state.tasks.slice();
 
         if(task.text)
             currentTasks.unshift(task);
 
         this.setState({
-            'tasks' : currentTasks
+            tasks : currentTasks
         });
 
     },
-    onToDoFilter(filter) {
+    handleToDoFilter(filter) {
         this.setState({
-            'filter': filter
+            filter
         });
     },
-    onToDoComplete(task) {
-        let currentTasks = this.state.tasks.slice();
+    handleToDoComplete(task) {
+        let tasks = this.state.tasks.slice();
 
-        currentTasks.forEach(elem => {
+        tasks.map(elem => {
             if(elem.id === task.id)
-                elem.complete = !task.complete;
+                elem.complete = !elem.complete;
         });
 
         this.setState({
-            tasks: currentTasks
+            tasks: tasks
         });
     },
-    onToDoRemove(task) {
-        let newTasks = this.state.tasks.filter(el => {
-            return el.id !== task.id;
-        });
+    handleToDoRemove(task) {
+        const newTasks = this.state.tasks.filter( el => el.id !== task.id );
 
         this.setState({
-            'tasks' : newTasks
+            tasks : newTasks
         });
     },
     render() {
         return (
             <div id="todo-app">
-                <NewToDo onToDoAdd={this.onToDoAdd}/>
+                <NewToDo onToDoAdd={this.handleToDoAdd} />
                 <FiltersToDo
-                    onToDoFilter={this.onToDoFilter}
                     currentFilter={this.state.filter}
+                    onToDoFilter={this.handleToDoFilter}
                 />
                 <ListToDo
-                    onToDoComplete={this.onToDoComplete}
-                    onToDoRemove={this.onToDoRemove}
-                    tasks={this._getVisibleTasks(this.state.tasks, this.state.filter)} />
+                    tasks={this._getVisibleTasks(this.state.tasks, this.state.filter)}
+                    onToDoComplete={this.handleToDoComplete}
+                    onToDoRemove={this.handleToDoRemove}
+                />
             </div>
         );
     },
@@ -207,6 +211,6 @@ const ToDoApp = React.createClass({
 });
 
 ReactDOM.render(
-    <ToDoApp/>,
+    <ToDoApp />,
     document.getElementById('todo-list')
 );
