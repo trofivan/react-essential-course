@@ -161,11 +161,12 @@ const ToDoApp = React.createClass({
         });
     },
     handleToDoComplete(task) {
-        let tasks = this.state.tasks.slice();
+        const tasks = this.state.tasks.slice();
 
-        tasks.map(elem => {
-            if(elem.id === task.id)
+        let newTasks = tasks.map(elem => {
+            if(task.id === elem.id)
                 elem.complete = !elem.complete;
+            return elem;
         });
 
         this.setState({
